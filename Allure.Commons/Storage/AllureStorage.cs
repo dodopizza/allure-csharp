@@ -4,60 +4,70 @@ using System.Threading;
 
 namespace Allure.Commons.Storage
 {
-    internal class AllureStorage
-    {
-        private readonly ThreadLocal<LinkedList<string>> stepContext = new ThreadLocal<LinkedList<string>>(() =>
-        {
-            return new LinkedList<string>();
-        });
+	internal class AllureStorage
+	{
+#if !(NET45)
+		private readonly AsyncLocal<LinkedList<string>> stepContextLocal = new AsyncLocal<LinkedList<string>>();
 
-        private readonly ConcurrentDictionary<string, object> storage = new ConcurrentDictionary<string, object>();
+		private LinkedList<string> stepContext
+		{
+			get => stepContextLocal.Value ?? (stepContextLocal.Value = new LinkedList<string>());
+			set => stepContextLocal.Value = value;
+		}
+#else
+		// May throw errors when await is using
+		private readonly ThreadLocal<LinkedList<string>> stepContextLocal =
+			new ThreadLocal<LinkedList<string>>(() => new LinkedList<string>());
 
-        public T Get<T>(string uuid)
-        {
-            return (T) storage[uuid];
-        }
+		private LinkedList<string> stepContext => stepContextLocal.Value;
+#endif
+		private readonly ConcurrentDictionary<string, object> storage = new ConcurrentDictionary<string, object>();
 
-        public T Put<T>(string uuid, T item)
-        {
-            return (T) storage.GetOrAdd(uuid, item);
-        }
+		public T Get<T>(string uuid)
+		{
+			return (T) storage[uuid];
+		}
 
-        public T Remove<T>(string uuid)
-        {
-            storage.TryRemove(uuid, out var value);
-            return (T) value;
-        }
+		public T Put<T>(string uuid, T item)
+		{
+			return (T) storage.GetOrAdd(uuid, item);
+		}
 
-        public void ClearStepContext()
-        {
-            stepContext.Value.Clear();
-        }
+		public T Remove<T>(string uuid)
+		{
+			storage.TryRemove(uuid, out var value);
+			return (T) value;
+		}
 
-        public void StartStep(string uuid)
-        {
-            stepContext.Value.AddFirst(uuid);
-        }
+		public void ClearStepContext()
+		{
+			stepContext.Clear();
+		}
 
-        public void StopStep()
-        {
-            stepContext.Value.RemoveFirst();
-        }
+		public void StartStep(string uuid)
+		{
+			stepContext.AddFirst(uuid);
+		}
 
-        public string GetRootStep()
-        {
-            return stepContext.Value.Last?.Value;
-        }
+		public void StopStep()
+		{
+			stepContext.RemoveFirst();
+		}
 
-        public string GetCurrentStep()
-        {
-            return stepContext.Value.First?.Value;
-        }
+		public string GetRootStep()
+		{
+			return stepContext.Last?.Value;
+		}
 
-        public void AddStep(string parentUuid, string uuid, StepResult stepResult)
-        {
-            Put(uuid, stepResult);
-            Get<ExecutableItem>(parentUuid).steps.Add(stepResult);
-        }
-    }
+		public string GetCurrentStep()
+		{
+			return stepContext.First?.Value;
+		}
+
+		public void AddStep(string parentUuid, string uuid, StepResult stepResult)
+		{
+			Put(uuid, stepResult);
+			Get<ExecutableItem>(parentUuid).steps.Add(stepResult);
+		}
+	}
 }
