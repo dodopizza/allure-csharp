@@ -22,6 +22,8 @@ jobs:
         with:
           dotnet-version: |
             3.1.*
+            5.0.*
+            6.0.*
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
 
