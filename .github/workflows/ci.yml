@@ -22,9 +22,6 @@ jobs:
         with:
           dotnet-version: |
             3.1.*
-            5.0.*
-            6.0.*
-          source-url: ${{ secrets.NUGET_SOURCE }}
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
 
@@ -48,5 +45,5 @@ jobs:
         run: >
           dotnet nuget push output/packages/*.nupkg
           --source ${{ secrets.NUGET_SOURCE }}
-          --api-key ${{ secrets.GITHUB_TOKEN }}
+          --api-key "https://nuget.pkg.github.com/dodopizza/index.json"
           --skip-duplicate
