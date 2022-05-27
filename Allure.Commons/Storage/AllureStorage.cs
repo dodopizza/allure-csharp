@@ -1,26 +1,21 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Allure.Commons.Storage
 {
 	internal class AllureStorage
 	{
-#if !(NET45)
-		private readonly AsyncLocal<LinkedList<string>> stepContextLocal = new AsyncLocal<LinkedList<string>>();
+		private readonly StepKeyLocator stepKeyLocator;
 
-		private LinkedList<string> stepContext
+		private readonly ConcurrentDictionary<string, LinkedList<string>> stepContextLocal = new();
+
+		public AllureStorage(StepKeyLocator stepKeyLocator)
 		{
-			get => stepContextLocal.Value ?? (stepContextLocal.Value = new LinkedList<string>());
-			set => stepContextLocal.Value = value;
+			this.stepKeyLocator = stepKeyLocator;
 		}
-#else
-		// May throw errors when await is using
-		private readonly ThreadLocal<LinkedList<string>> stepContextLocal =
-			new ThreadLocal<LinkedList<string>>(() => new LinkedList<string>());
 
-		private LinkedList<string> stepContext => stepContextLocal.Value;
-#endif
+		private LinkedList<string> stepContext => stepContextLocal.GetOrAdd(stepKeyLocator.Locator(), new LinkedList<string>());
+
 		private readonly ConcurrentDictionary<string, object> storage = new ConcurrentDictionary<string, object>();
 
 		public T Get<T>(string uuid)

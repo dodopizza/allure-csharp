@@ -18,7 +18,8 @@ namespace Allure.Commons
         private static AllureLifecycle instance;
         private readonly AllureStorage storage;
         private readonly IAllureResultsWriter writer;
-
+        private readonly StepKeyLocator _stepKeyLocator;
+        
         internal AllureLifecycle(): this(GetConfiguration())
         {
         }
@@ -27,8 +28,9 @@ namespace Allure.Commons
         {
             JsonConfiguration = config.ToString();
             AllureConfiguration = AllureConfiguration.ReadFromJObject(config);
+            _stepKeyLocator = new StepKeyLocator();
             writer = new FileSystemResultsWriter(AllureConfiguration);
-            storage = new AllureStorage();
+            storage = new AllureStorage(_stepKeyLocator);
             lock (Lockobj)
             {
                 instance = this;
@@ -225,6 +227,7 @@ namespace Allure.Commons
 
         public virtual AllureLifecycle StopStep(string uuid)
         {
+            // Console.WriteLine("StopStep uuid {0}", uuid);
             var step = storage.Remove<StepResult>(uuid);
             step.stage = Stage.finished;
             step.stop = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -288,6 +291,11 @@ namespace Allure.Commons
                 .UpdateTestCase(testCaseUuid, x => x.labels.Add(Label.TestType("screenshotDiff")));
 
             return this;
+        }
+
+        public void SetKeyLocator(Func<string> locator)
+        {
+            _stepKeyLocator.Locator = locator;
         }
 
         #endregion
