@@ -16,7 +16,7 @@ namespace Allure.Commons.Storage
 
 		private LinkedList<string> stepContext => stepContextLocal.GetOrAdd(stepKeyLocator.Locator(), new LinkedList<string>());
 
-		private readonly ConcurrentDictionary<string, object> storage = new ConcurrentDictionary<string, object>();
+		private readonly ConcurrentDictionary<string, object> storage = new();
 
 		public T Get<T>(string uuid)
 		{
@@ -37,6 +37,7 @@ namespace Allure.Commons.Storage
 		public void ClearStepContext()
 		{
 			stepContext.Clear();
+			stepContextLocal.TryRemove(stepKeyLocator.Locator(), out _);
 		}
 
 		public void StartStep(string uuid)
