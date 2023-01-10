@@ -46,6 +46,7 @@ jobs:
       - name: Pack Allure.Net.Commons
         run: >
           dotnet pack Allure.Net.Commons/
+          -p:TargetFrameworks=netstandard2.0
           --no-build
           --configuration Release
           --output output/packages
