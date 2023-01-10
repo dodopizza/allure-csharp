@@ -36,13 +36,20 @@ jobs:
       - name: Build Nuget packages
         run: dotnet build Allure.NUnit/ --configuration Release
 
-      - name: Pack Nuget packages
+      - name: Pack Allure.NUnit
         run: >
           dotnet pack Allure.NUnit/
           --no-build
           --configuration Release
           --output output/packages
-
+          
+      - name: Pack Allure.Net.Commons
+        run: >
+          dotnet pack Allure.Net.Commons/
+          --no-build
+          --configuration Release
+          --output output/packages
+          
       - name: Publish Nuget packages
         run: >
           dotnet nuget push output/packages/*.nupkg

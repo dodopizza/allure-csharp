@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-        <Version>2.10-SNAPSHOT</Version>
+        <Version>4.0.1-preview-dodo</Version>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <Authors>Alexander Bakanov, Nikolay Laptev</Authors>
         <Company>Qameta Software</Company>
@@ -21,6 +21,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageVersion>4.0.1-preview-dodo</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
