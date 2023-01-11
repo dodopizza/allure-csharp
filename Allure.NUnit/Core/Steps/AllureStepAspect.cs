@@ -85,7 +85,7 @@ namespace NUnit.Allure.Core.Steps
                             PassStep(metadata);
                             PassFixture(metadata);
                         }
-                    }).Wait();
+                    });
                 }
                 else
                 {
