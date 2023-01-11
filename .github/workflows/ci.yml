@@ -37,7 +37,7 @@ jobs:
         run: dotnet build Allure.NUnit/ --configuration Release
 
       - name: Build Nuget packages
-        run: dotnet build Allure.SpecflowPlugin/ --configuration Release
+        run: dotnet build Allure.SpecFlowPlugin/ --configuration Release
         
       - name: Pack Allure.NUnit
         run: >
@@ -54,9 +54,9 @@ jobs:
           --configuration Release
           --output output/packages
          
-      - name: Pack Allure.SpecflowPlugin
+      - name: Pack Allure.SpecFlowPlugin
         run: >
-          dotnet pack Allure.SpecflowPlugin/
+          dotnet pack Allure.SpecFlowPlugin/
           --no-build
           --configuration Release
           --output output/packages
